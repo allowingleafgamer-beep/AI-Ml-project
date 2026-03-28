@@ -1,0 +1,348 @@
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+
+spam_emails = [
+    "Win a free iPhone now click here to claim your prize",
+    "Congratulations you have won 1 crore rupees click now",
+    "You are selected for lottery prize claim immediately",
+    "Win cash prize enter now free entry guaranteed winner",
+    "You have been chosen as the lucky winner claim today",
+    "Your name was picked in our lucky draw call us now",
+    "Free prize waiting for you just click the link below",
+    "Lottery winner announcement you have won click here",
+    "Claim your reward of 50000 rupees today only",
+    "You won a shopping voucher worth 10000 redeem now",
+    "Get rich quick work from home earn 50000 per day",
+    "Make money fast guaranteed investment double profit",
+    "Double your investment guaranteed returns call now",
+    "Earn money online no experience needed start today",
+    "Send your bank details to claim your prize money",
+    "Invest just 1000 rupees and earn 10000 every month",
+    "Guaranteed profit scheme join now limited slots only",
+    "Work from home and earn 5000 daily no skills needed",
+    "Best investment plan 100 percent profit guaranteed",
+    "Start earning today no investment no risk join free",
+    "FREE offer limited time buy now discount sale",
+    "Click here for free gift card no cost to you",
+    "Exclusive deal only for you 90 percent off today",
+    "Hot deal free offer click now limited time only",
+    "Cheap flights book now limited seats hurry up",
+    "Free recharge offer click here to get 500 rupees",
+    "Get free data 10GB limited time offer click now",
+    "Buy one get one free offer ends tonight hurry",
+    "Flat 80 percent off on all items today only sale",
+    "Free home delivery on all orders no minimum order",
+    "Urgent your account will be closed verify now",
+    "Your credit card has been charged refund click here",
+    "Your phone has a virus click to remove it now",
+    "Your bank account is suspended click to reactivate",
+    "Security alert your password was changed click here",
+    "Unusual login detected verify your account now",
+    "Your email storage is full upgrade now for free",
+    "Action required your account will be deleted today",
+    "Verify your identity immediately or lose access",
+    "Your payment failed update card details click here",
+    "You are pre approved for a loan apply now free",
+    "Personal loan approved no documents needed call now",
+    "Get instant loan 50000 rupees in 10 minutes apply",
+    "Low interest loan offer just call this number now",
+    "Credit card approved for you no income proof needed",
+    "Zero interest EMI offer on all products buy now",
+    "Debt relief program join now and clear all dues",
+    "Easy loan approval guaranteed bad credit ok apply",
+    "Home loan at lowest rate ever call us today only",
+    "Business loan 1 lakh in 24 hours apply online now",
+    "Buy cheap medicine online no prescription needed",
+    "Lose weight fast miracle pill no diet needed",
+    "Doctor approved weight loss pill order now free",
+    "Cure diabetes in 7 days natural remedy order now",
+    "Hair regrowth guaranteed in 30 days buy now",
+    "Increase height naturally with our special capsule",
+    "100 percent cure for all diseases call this number",
+    "Anti aging cream makes you look 20 years younger",
+    "Boost immunity instantly with this special drink",
+    "Cancer cure discovered order the medicine online",
+    "Part time job earn 3000 per day from home apply",
+    "Hiring now no experience needed earn daily salary",
+    "Data entry job work from home earn 500 per hour",
+    "Online job opportunity for students apply today",
+    "Freelance work available earn 2000 daily from home",
+    "Company hiring freshers salary 50000 apply now",
+    "Government job vacancy apply before deadline today",
+    "Amazon hiring work from home job apply now free",
+    "Content writing job earn per article apply today",
+    "Survey job earn 200 per survey work anytime",
+    "You have a secret admirer click to find out who",
+    "Free vacation trip winner selected click to claim",
+    "Download free movies click here no subscription",
+    "Get 10000 Instagram followers in one day click now",
+    "Earn by watching ads 500 rupees per ad sign up",
+    "WhatsApp is shutting down unless you forward this",
+    "Your sim card will be blocked update KYC now",
+    "Flash sale 95 percent off only 10 minutes left",
+    "Click this link to double your Paytm wallet money",
+    "Income tax refund pending click to claim it now",
+    "Register now and get 500 rupees cashback instantly",
+    "Urgent message from your bank update details now",
+    "Free online course certificate apply now limited",
+    "Your KYC is incomplete complete it to avoid block",
+    "Special offer for Airtel users get free data now",
+    "Your electricity bill payment failed pay now",
+    "You qualify for government subsidy apply today",
+    "Order now and get free shipping plus mystery gift",
+    "Congratulations your survey is complete claim now",
+    "Hack wifi passwords with this app download free",
+    "Earn 1000 rupees per hour from your mobile phone",
+    "Jackpot winner you have been selected call now",
+    "Free gold coin offer limited time click to get",
+    "Your mobile number won prize in lucky draw today",
+    "Claim free Netflix subscription click link now",
+    "Share this message with 10 friends to win prize",
+    "Send 100 rupees to get 1000 rupees back guaranteed",
+    "Your Aadhaar card is blocked update details now",
+    "Exclusive membership free for first 100 users only",
+    "Discount coupon of 2000 rupees waiting for you",
+]
+
+non_spam_emails = [
+    "Hey can we meet tomorrow for the project discussion",
+    "Please find attached the assignment for submission",
+    "The class tomorrow is postponed to next Monday",
+    "Can you send me the notes from todays lecture",
+    "The exam results will be announced on Friday",
+    "Please submit your project report before Sunday",
+    "Can we study together for the final exam this weekend",
+    "The professor cancelled the class for today",
+    "Please bring your ID card for the exam tomorrow",
+    "Can you help me understand this topic after college",
+    "Happy birthday hope you have a wonderful day",
+    "Mom said dinner is ready please come home soon",
+    "Are you coming to the cricket match on Sunday",
+    "Let us catch up this weekend it has been a while",
+    "Did you watch the movie last night it was amazing",
+    "Can you bring some snacks when you come over today",
+    "I will be late to college today traffic is bad",
+    "Bro where are you we are waiting at the canteen",
+    "Happy new year may this year bring you happiness",
+    "Thanks for coming to my birthday party yesterday",
+    "Meeting rescheduled to 3pm please confirm attendance",
+    "Thank you for your help with the homework yesterday",
+    "Please review the attached document and give feedback",
+    "The project deadline has been extended to next Friday",
+    "Can you please share the presentation before the call",
+    "The client meeting is confirmed for tomorrow at 11am",
+    "Please send the invoice by end of day today",
+    "Team lunch is arranged for Friday at 1pm join us",
+    "The annual report has been submitted successfully",
+    "Welcome to the team we are happy to have you here",
+    "Your order has been shipped and will arrive tomorrow",
+    "Your order number 12345 has been delivered today",
+    "Your return request has been accepted refund in 3 days",
+    "Thanks for shopping with us your bill is attached",
+    "Your wishlist item is back in stock order now",
+    "Your Amazon order is out for delivery today",
+    "Receipt for your purchase of 1299 rupees attached",
+    "Your Flipkart order has been confirmed thank you",
+    "Item you reviewed is now on sale check it out",
+    "Your subscription renewal is due on 15th this month",
+    "Your salary of 25000 has been credited to your account",
+    "Your UPI transaction of 500 to Rahul was successful",
+    "Monthly bank statement for October is now available",
+    "Your fixed deposit maturity date is 20th November",
+    "EMI of 3500 has been debited from your account",
+    "Your cheque has been cleared and amount credited",
+    "Net banking password will expire in 30 days update",
+    "Your account balance is low please add funds",
+    "Transaction alert 1200 debited from your account",
+    "Your credit card bill of 4500 is due on 25th",
+    "Your father called please call him back when free",
+    "Dinner is at 8pm today please come home on time",
+    "Your cousin is getting married on 15th December",
+    "Mom wants to know if you are coming home this weekend",
+    "Please pick up your younger sister from school today",
+    "Grandma is not well please visit her this Sunday",
+    "Family trip to Shimla is planned for next month",
+    "Uncle asked me to remind you about the meeting",
+    "Your brother has reached home safely do not worry",
+    "Please buy milk and bread on your way back home",
+    "Your doctor appointment is confirmed for 10am Friday",
+    "Your blood test report is ready please collect it",
+    "Reminder please take your medicine at 9pm tonight",
+    "The hospital has rescheduled your appointment to Monday",
+    "Your health insurance premium is due next week",
+    "Drink enough water today it is very hot outside",
+    "Your dental checkup is due please book an appointment",
+    "The pharmacy has your prescription ready for pickup",
+    "Please rest well you looked tired in college today",
+    "Your annual health checkup reminder is for this month",
+    "The wifi password has been changed to college2024",
+    "Our team meeting is at 5pm in the library today",
+    "Your internship application has been received thank you",
+    "Reminder your library book is due next week",
+    "The bus timings have changed please check the schedule",
+    "Your package at the post office is ready for pickup",
+    "The canteen menu has changed check new items today",
+    "Please fill the feedback form before leaving today",
+    "Power cut scheduled tomorrow from 10am to 1pm",
+    "Your college ID card is ready please collect it",
+    "The seminar on AI is happening this Thursday at 3pm",
+    "Please register for the college fest before Friday",
+    "Your scholarship form has been received thank you",
+    "The sports day event is scheduled for next Saturday",
+    "New books have arrived in the library check them out",
+    "Holiday on Monday due to national festival enjoy",
+    "The college gate will close at 6pm from today",
+    "Your hostel room allocation is ready please check",
+    "The principal has announced a holiday for tomorrow",
+    "Please attend the workshop on resume building Friday",
+    "Can we do a group call tonight to discuss the topic",
+    "I submitted the assignment please check if it worked",
+    "Do you have the textbook I can borrow it for a day",
+    "The notes you shared were very helpful thank you",
+    "Reminder the college fee last date is this Friday",
+    "Your project group has been finalised check below",
+    "The results of the coding competition are out today",
+    "Please share your location I am near the college gate",
+    "We are going for lunch want to join us at 1pm",
+    "The practical exam schedule has been uploaded online",
+]
+
+emails = spam_emails + non_spam_emails
+labels = ["spam"] * 100 + ["non-spam"] * 100
+
+def train_model():
+
+    print("  Training model on 200 emails...")
+    appleiers = CountVectorizer()
+    X = appleiers.fit_transform(emails)
+
+    model = MultinomialNB()
+    model.fit(X, labels)
+
+    print("  Model trained successfully!")
+    return model, appleiers
+
+
+def check_accuracy(model, appliers):
+   
+    X = appliers.transform(emails)
+    predictions = model.predict(X)
+    accuracy = accuracy_score(labels, predictions) * 100
+
+    spam_correct = sum(1 for i in range(len(labels))
+                       if labels[i] == "spam" and predictions[i] == "spam")
+    non_spam_correct  = sum(1 for i in range(len(labels))
+                       if labels[i] == "non-spam"  and predictions[i] == "non-spam")
+
+    print(f"  Overall Accuracy    : {accuracy:.1f}%")
+    print(f"  Spam detected right : {spam_correct} / 100")
+    print(f"  Non-spam detected right  : {non_spam_correct}  / 100")
+    return accuracy
+
+def predict_email(email, model, appliers):
+
+    sections   = appliers.transform([email])
+    result   = model.predict(sections)[0]
+    probs    = model.predict_proba(sections)[0]
+    spam_percentage = probs[list(model.classes_).index("spam")] * 100
+    non_spam_percentage  = probs[list(model.classes_).index("non-spam")]  * 100
+    return result, spam_percentage, non_spam_percentage
+
+
+def print_result(email, result, spam_percentage, non_spam_percentage):
+    print()
+    print("-" * 45)
+    short = email[:47] + "..." if len(email) > 47 else email
+    print(f"  Email   : {short}")
+    print(f"  Result  : {'SPAM' if result == 'spam' else 'NOT SPAM'}")
+    print(f"  Spam    : {spam_percentage:.1f}%  {'#' * int(spam_percentage / 5)}")
+    print(f"  Normal  : {non_spam_percentage:.1f}%")
+    print("-" * 45)
+
+def check_multiple(model, appliers):
+    
+    spam_count = 0
+    non_spam_count  = 0
+    total      = 0
+
+    print()
+    print("  Enter emails one by one. Type 'done' to stop.")
+    print()
+
+    while True:
+        email = input(f"  Email #{total + 1}: ").strip()
+
+        if email.lower() == "done":
+            break
+        if email == "":
+            print("  Please type something!")
+            continue
+
+        result, spam_percentage, non_spam_percentage = predict_email(email, model, appliers)
+        print_result(email, result, spam_percentage, non_spam_percentage)
+
+        if result == "spam":
+            spam_count += 1
+        else:
+            non_spam_count += 1
+        total += 1
+
+    if total > 0:
+        print()
+        print("=" * 45)
+        print("  SUMMARY")
+        print("=" * 45)
+        print(f"  Total checked  : {total}")
+        print(f"  Spam found     : {spam_count}")
+        print(f"  Normal emails  : {non_spam_count}")
+        print()
+
+def main():
+    print()
+    print("=" * 45)
+    print("       SPAM EMAIL DETECTOR")
+    print("=" * 45)
+    print()
+
+    model, appleiers = train_model()
+    print()
+
+    while True:
+        print("=" * 45)
+        print("  MENU:")
+        print("  1. Check one email")
+        print("  2. Check multiple emails")
+        print("  3. See model accuracy")
+        print("  4. Exit")
+        print("=" * 45)
+
+        choice = input("  Enter your choice (1-4): ").strip()
+        print()
+
+        if choice == "1":
+            email = input("  Enter email message:\n  > ").strip()
+            if email == "":
+                print("  Please type something!")
+            else:
+                result, spam_percentage, non_spam_percentage = predict_email(email, model, appleiers)
+                print_result(email, result, spam_percentage, non_spam_percentage)
+
+        elif choice == "2":
+            check_multiple(model, appleiers)
+
+        elif choice == "3":
+            print("  Checking accuracy...")
+            check_accuracy(model, appleiers)
+            
+        elif choice == "4":
+            print("  Goodbye!")
+            break
+
+        else:
+            print("  Invalid choice. Please enter 1 to 4.")
+
+        print()
+
+
+main()
