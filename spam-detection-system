@@ -213,41 +213,41 @@ labels = ["spam"] * 100 + ["non-spam"] * 100
 
 def train_model():
 
-    print("  Training model on 200 emails...")
-    appleiers = CountVectorizer()
-    X = appleiers.fit_transform(emails)
-
-    model = MultinomialNB()
-    model.fit(X, labels)
-
-    print("  Model trained successfully!")
-    return model, appleiers
+            print("  Training model on 200 emails...")
+            appleiers = CountVectorizer()
+            X = appleiers.fit_transform(emails)
+        
+            model = MultinomialNB()
+            model.fit(X, labels)
+        
+            print("  Model trained successfully!")
+            return model, appleiers
 
 
 def check_accuracy(model, appliers):
    
-    X = appliers.transform(emails)
-    predictions = model.predict(X)
-    accuracy = accuracy_score(labels, predictions) * 100
-
-    spam_correct = sum(1 for i in range(len(labels))
-                       if labels[i] == "spam" and predictions[i] == "spam")
-    non_spam_correct  = sum(1 for i in range(len(labels))
-                       if labels[i] == "non-spam"  and predictions[i] == "non-spam")
-
-    print(f"  Overall Accuracy    : {accuracy:.1f}%")
-    print(f"  Spam detected right : {spam_correct} / 100")
-    print(f"  Non-spam detected right  : {non_spam_correct}  / 100")
-    return accuracy
+        X = appliers.transform(emails)
+        predictions = model.predict(X)
+        accuracy = accuracy_score(labels, predictions) * 100
+    
+        spam_correct = sum(1 for i in range(len(labels))
+                           if labels[i] == "spam" and predictions[i] == "spam")
+        non_spam_correct  = sum(1 for i in range(len(labels))
+                           if labels[i] == "non-spam"  and predictions[i] == "non-spam")
+    
+        print(f"  Overall Accuracy    : {accuracy:.1f}%")
+        print(f"  Spam detected right : {spam_correct} / 100")
+        print(f"  Non-spam detected right  : {non_spam_correct}  / 100")
+        return accuracy
 
 def predict_email(email, model, appliers):
 
-    sections   = appliers.transform([email])
-    result   = model.predict(sections)[0]
-    probs    = model.predict_proba(sections)[0]
-    spam_percentage = probs[list(model.classes_).index("spam")] * 100
-    non_spam_percentage  = probs[list(model.classes_).index("non-spam")]  * 100
-    return result, spam_percentage, non_spam_percentage
+            sections   = appliers.transform([email])
+            result   = model.predict(sections)[0]
+            probs    = model.predict_proba(sections)[0]
+            spam_percentage = probs[list(model.classes_).index("spam")] * 100
+            non_spam_percentage  = probs[list(model.classes_).index("non-spam")]  * 100
+            return result, spam_percentage, non_spam_percentage
 
 
 def print_result(email, result, spam_percentage, non_spam_percentage):
@@ -262,87 +262,87 @@ def print_result(email, result, spam_percentage, non_spam_percentage):
 
 def check_multiple(model, appliers):
     
-    spam_count = 0
-    non_spam_count  = 0
-    total      = 0
-
-    print()
-    print("  Enter emails one by one. Type 'done' to stop.")
-    print()
-
-    while True:
-        email = input(f"  Email #{total + 1}: ").strip()
-
-        if email.lower() == "done":
-            break
-        if email == "":
-            print("  Please type something!")
-            continue
-
-        result, spam_percentage, non_spam_percentage = predict_email(email, model, appliers)
-        print_result(email, result, spam_percentage, non_spam_percentage)
-
-        if result == "spam":
-            spam_count += 1
-        else:
-            non_spam_count += 1
-        total += 1
-
-    if total > 0:
-        print()
-        print("=" * 45)
-        print("  SUMMARY")
-        print("=" * 45)
-        print(f"  Total checked  : {total}")
-        print(f"  Spam found     : {spam_count}")
-        print(f"  Normal emails  : {non_spam_count}")
-        print()
+            spam_count = 0
+            non_spam_count  = 0
+            total      = 0
+        
+            print()
+            print("  Enter emails one by one. Type 'done' to stop.")
+            print()
+        
+            while True:
+                email = input(f"  Email #{total + 1}: ").strip()
+        
+                if email.lower() == "done":
+                    break
+                if email == "":
+                    print("  Please type something!")
+                    continue
+        
+                result, spam_percentage, non_spam_percentage = predict_email(email, model, appliers)
+                print_result(email, result, spam_percentage, non_spam_percentage)
+        
+                if result == "spam":
+                    spam_count += 1
+                else:
+                    non_spam_count += 1
+                total += 1
+        
+            if total > 0:
+                print()
+                print("=" * 45)
+                print("  SUMMARY")
+                print("=" * 45)
+                print(f"  Total checked  : {total}")
+                print(f"  Spam found     : {spam_count}")
+                print(f"  Normal emails  : {non_spam_count}")
+                print()
 
 def main():
-    print()
-    print("=" * 45)
-    print("       SPAM EMAIL DETECTOR")
-    print("=" * 45)
-    print()
-
-    model, appleiers = train_model()
-    print()
-
-    while True:
-        print("=" * 45)
-        print("  MENU:")
-        print("  1. Check one email")
-        print("  2. Check multiple emails")
-        print("  3. See model accuracy")
-        print("  4. Exit")
-        print("=" * 45)
-
-        choice = input("  Enter your choice (1-4): ").strip()
-        print()
-
-        if choice == "1":
-            email = input("  Enter email message:\n  > ").strip()
-            if email == "":
-                print("  Please type something!")
-            else:
-                result, spam_percentage, non_spam_percentage = predict_email(email, model, appleiers)
-                print_result(email, result, spam_percentage, non_spam_percentage)
-
-        elif choice == "2":
-            check_multiple(model, appleiers)
-
-        elif choice == "3":
-            print("  Checking accuracy...")
-            check_accuracy(model, appleiers)
-            
-        elif choice == "4":
-            print("  Goodbye!")
-            break
-
-        else:
-            print("  Invalid choice. Please enter 1 to 4.")
-
-        print()
+                    print()
+                    print("=" * 45)
+                    print("       SPAM EMAIL DETECTOR")
+                    print("=" * 45)
+                    print()
+                
+                    model, appleiers = train_model()
+                    print()
+                
+                    while True:
+                        print("=" * 45)
+                        print("  MENU:")
+                        print("  1. Check one email")
+                        print("  2. Check multiple emails")
+                        print("  3. See model accuracy")
+                        print("  4. Exit")
+                        print("=" * 45)
+                
+                        choice = input("  Enter your choice (1-4): ").strip()
+                        print()
+                
+                        if choice == "1":
+                            email = input("  Enter email message:\n  > ").strip()
+                            if email == "":
+                                print("  Please type something!")
+                            else:
+                                result, spam_percentage, non_spam_percentage = predict_email(email, model, appleiers)
+                                print_result(email, result, spam_percentage, non_spam_percentage)
+                
+                        elif choice == "2":
+                            check_multiple(model, appleiers)
+                
+                        elif choice == "3":
+                            print("  Checking accuracy...")
+                            check_accuracy(model, appleiers)
+                            
+                        elif choice == "4":
+                            print("  Goodbye!")
+                            break
+                
+                        else:
+                            print("  Invalid choice. Please enter 1 to 4.")
+                
+                        print()
 
 
 main()
